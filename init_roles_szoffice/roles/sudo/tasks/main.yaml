@@ -1,0 +1,2 @@
+- name: 配置sudo权限
+  copy: src=sudoers dest="{{sudoers_directory}}" mode=0440

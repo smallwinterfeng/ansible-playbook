@@ -1,0 +1,4 @@
+[news]
+
+[news:vars]   # ops,uat,sit,big_data,dev
+env=sit

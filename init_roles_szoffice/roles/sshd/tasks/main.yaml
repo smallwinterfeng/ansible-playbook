@@ -1,0 +1,3 @@
+- name: 配置ssh服务
+  copy: src=sshd_config dest="{{config_directory}}" mode=0600 
+  notify: 重启sshd服务

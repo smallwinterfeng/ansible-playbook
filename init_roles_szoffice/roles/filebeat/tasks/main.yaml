@@ -1,0 +1,12 @@
+- name: 拷贝filebeat安装包
+  copy: src="filebeat-6.6.1-x86_64.rpm" dest="/tmp"
+
+- name: 安装filebeat
+  shell: rpm -ivh /tmp/filebeat-6.6.1-x86_64.rpm
+
+- name: 拷贝filebeat配置文件
+  copy: src="filebeat.yml" dest="/etc/filebeat/filebeat.yml" backup=yes
+
+- name: 启动filebeat服务
+  service: name=filebeat state=started
+  notify: 启动filebeat服务

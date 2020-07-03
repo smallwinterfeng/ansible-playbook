@@ -1,0 +1,2 @@
+- name: 配置DNS服务器
+  copy: src=resolv.conf dest="{{dns_config}}" mode=0644

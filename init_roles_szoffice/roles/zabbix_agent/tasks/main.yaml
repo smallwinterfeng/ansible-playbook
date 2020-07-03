@@ -1,0 +1,57 @@
+- name: 检查zabbix是否安装
+  shell: rpm -qa|grep zabbix
+  register: result
+  ignore_errors: yes
+
+- name: 拷贝zabbix agent安装包
+  copy: src=/etc/ansible/roles/zabbix_agent/files/zabbix-agent-3.4.1-1.el7.x86_64.rpm dest=/tmp/
+  when: result|failed
+
+- name: 安装zabbix agent
+  yum: name=/tmp/zabbix-agent-3.4.1-1.el7.x86_64.rpm state=present
+  when: result|failed
+
+- name: 拷贝zabbix agent 配置文件
+  copy: src=/etc/ansible/roles/zabbix_agent/files/disk_io.conf dest=/etc/zabbix/zabbix_agentd.d backup=true
+  
+- name: 拷贝zabbix linux conf 配置文件
+  copy: src=/etc/ansible/roles/zabbix_agent/files/linux.conf dest=/etc/zabbix/zabbix_agentd.d backup=true
+
+#- name: 修改配置 zabbix agetn配置文件
+#  shell: sed -i "s/^Hostname=/Hostname={{ansible_nodename}}/" /etc/zabbix/zabbix_agentd.conf
+- name: 修改配置 zabbix agetn配置文件
+  template: src=/etc/ansible/roles/zabbix_agent/files/zabbix_agentd.j2 dest=/etc/zabbix/zabbix_agentd.conf backup=true
+
+- name: 新建插件目录
+  shell: mkdir -p /etc/zabbix/plugins 
+
+- name: 增加磁盘自动发现脚本
+  copy: src=/etc/ansible/roles/zabbix_agent/files/discoverDisks.pl dest=/etc/zabbix/plugins/
+
+- name: 新建zabbix lib目录
+  shell: mkdir -p /etc/zabbix/lib
+
+- name: 配置zabbix_module_docker模块
+  copy: src=/etc/ansible/playbook/source/zabbix/zabbix_module_docker.so dest=/etc/zabbix/lib/
+
+- name: 添加可执行权限
+  shell: chmod +x /etc/zabbix/lib/zabbix_module_docker.so
+
+- name: 修改配置文件已root用户启动
+  shell: |
+         sed -i "/^# AllowRoot=0/a AllowRoot=1" /etc/zabbix/zabbix_agentd.conf
+         sed -i "/^# User=zabbix/a User=root" /etc/zabbix/zabbix_agentd.conf
+
+- name: 修改配置文件加载lib目录
+  shell: |
+         echo "LoadModulePath=/etc/zabbix/lib" >> /etc/zabbix/zabbix_agentd.conf
+         echo "LoadModule=zabbix_module_docker.so" >> /etc/zabbix/zabbix_agentd.conf
+
+- name: set zabbix hostname
+  shell: >
+         ip=`echo "{{ansible_default_ipv4.address}}"|awk -F'.' '{print $4}'` && 
+         hostname="{{env}}_$ip" &&
+         sed -i "s@Hostname=localhost.localdomain@Hostname=$hostname@g" /etc/zabbix/zabbix_agentd.conf
+
+- name: 启动zabbix_agent 服务
+  service: enabled=true name=zabbix-agent state=started

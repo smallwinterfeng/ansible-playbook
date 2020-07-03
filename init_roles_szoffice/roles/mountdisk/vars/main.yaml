@@ -1,0 +1,4 @@
+disk: /dev/sdb
+vgname: vgdata
+lvname: lvdata
+mountpoint: /opt

@@ -1,0 +1,2 @@
+- name: 启动NTP服务
+  service: name=ntpd state=started

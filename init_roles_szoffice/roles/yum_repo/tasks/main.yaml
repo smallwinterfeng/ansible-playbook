@@ -1,0 +1,16 @@
+- name: 新建备份目录
+  file: path=/etc/yum.repos.d/back state=directory 
+
+- name: 清理yum源目录
+  shell: mv  /etc/yum.repos.d/*.repo /etc/yum.repos.d/back
+
+- name: 配置yum源
+  copy: src="{{item}}" dest="{{yum_directory}}"
+  with_items:
+    - CentOS-Base.repo
+    - epel.repo
+    - docker-ce.repo
+
+- name: 配置RPM-GPG-KEY-EPEL-7
+  copy: src=RPM-GPG-KEY-EPEL-7 dest=/etc/pki/rpm-gpg/
+

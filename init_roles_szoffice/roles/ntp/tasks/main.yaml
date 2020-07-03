@@ -1,0 +1,6 @@
+- name: 安装NTP服务包
+  yum: name=ntp state=present
+
+- name: 配置NTP服务器
+  copy: src=ntp.conf  dest="{{ntp_config}}" mode=0644
+  notify: 启动NTP服务

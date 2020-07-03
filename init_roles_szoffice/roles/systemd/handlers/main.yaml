@@ -1,0 +1,14 @@
+- name: 关闭开机启动防火墙firewalld
+  shell: systemctl disable firewalld
+
+- name: 关闭网络管理工具NetworkManager
+  shell: systemctl disable NetworkManager
+
+- name: 关闭开机启动postfix服务
+  shell: systemctl disable postfix
+
+- name: 关闭开机启动rpcbind服务
+  shell: systemctl disable rpcbind
+
+- name: 关闭开机启动chronyd服务
+  shell: systemctl disable chronyd

@@ -1,0 +1,74 @@
+- name: 加密密码生成器
+  shell: >
+         if [[ "{{env}}a" == "a" ]];then
+             echo "生成默认密码"
+         else
+             echo "生产 {{env}} 用户密码"
+         fi
+
+- name: 加密密码生成器--生成root用户的密码
+  shell: >
+         if [[ "{{env}}" == "ops" ]];then
+           python -c 'import crypt;print crypt.crypt("{{ops_root_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "big_data" ]];then
+           python -c 'import crypt;print crypt.crypt("{{big_data_root_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "uat" ]];then
+           python -c 'import crypt;print crypt.crypt("{{uat_root_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "dev" ]];then
+           python -c 'import crypt;print crypt.crypt("{{dev_root_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "sit" ]];then
+           python -c 'import crypt;print crypt.crypt("{{test_root_pwd}}", "$1$SomeSalt$")'
+         else
+           python -c 'import crypt;print crypt.crypt("{{root_pwd}}", "$1$SomeSalt$")'
+         fi
+  register: passwd_root    
+
+- name: 加密密码生成器--生成ops用户的密码
+  shell: >
+         if [[ "{{env}}" == "ops" ]];then
+           python -c 'import crypt;print crypt.crypt("{{ops_ops_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "big_data" ]];then
+           python -c 'import crypt;print crypt.crypt("{{big_data_ops_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "uat" ]];then
+           python -c 'import crypt;print crypt.crypt("{{uat_ops_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "dev" ]];then
+           python -c 'import crypt;print crypt.crypt("{{dev_ops_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "sit" ]];then
+           python -c 'import crypt;print crypt.crypt("{{test_ops_pwd}}", "$1$SomeSalt$")'
+         else
+           python -c 'import crypt;print crypt.crypt("{{ops_pwd}}", "$1$SomeSalt$")'
+         fi
+  register: passwd_ops
+
+- name: 加密密码生成器--生成dev用户的密码
+  shell: >
+         if [[ "{{env}}" == "ops" ]];then
+           python -c 'import crypt;print crypt.crypt("{{ops_dev_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "big_data" ]];then
+           python -c 'import crypt;print crypt.crypt("{{big_data_dev_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "uat" ]];then
+           python -c 'import crypt;print crypt.crypt("{{uat_dev_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "dev" ]];then
+           python -c 'import crypt;print crypt.crypt("{{dev_dev_pwd}}", "$1$SomeSalt$")'
+         elif [[ "{{env}}" == "sit" ]];then
+           python -c 'import crypt;print crypt.crypt("{{test_dev_pwd}}", "$1$SomeSalt$")'
+         else
+           python -c 'import crypt;print crypt.crypt("{{dev_pwd}}", "$1$SomeSalt$")'
+         fi
+  register: passwd_dev
+
+- name: 初始化root密码
+  user: name=root password="{{passwd_root.stdout}}"
+
+- name: 添加operations组
+  group: name=operations state=present
+
+- name: 添加developers组
+  group: name=developers state=present     
+
+- name: 添加ops用户
+  user: name=ops group=operations password="{{passwd_ops.stdout}}"
+
+- name: 添加dev用户
+  user: name=dev group=developers password="{{passwd_dev.stdout}}"
+

@@ -1,0 +1,5 @@
+- name: 设置主机名
+  shell: >
+        if [[ "{{ansible_nodename}}" == "localhost.localdomain" ]];then
+           ip=`echo "{{ansible_default_ipv4.address}}"|awk -F'.' '{print $4}'` && hostnamectl set-hostname "{{env}}_$ip" && echo "127.0.0.1 {{env}}_$ip" >> /etc/hosts
+        fi

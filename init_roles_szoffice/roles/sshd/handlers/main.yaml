@@ -1,0 +1,2 @@
+- name: 重启sshd服务
+  service: name=sshd state=restarted

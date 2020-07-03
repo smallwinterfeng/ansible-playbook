@@ -1,0 +1,24 @@
+- name: 初始化服务器
+  hosts: news
+  gather_facts: true
+  pre_tasks:
+    - name: 任务开始运行主机
+      debug: var=ansible_default_ipv4.address 
+
+  roles:
+    - {role: auth, tags: auth}
+    - {role: users, tags: users}
+    - {role: systemd, tags: systemd}
+    - {role: set_hostname, tags: hostname}
+    - {role: sudo, tags: sudo}
+    - {role: dns, tags: dns}
+    - {role: yum_repo, tags: yum_repo}
+    - {role: ntp, tags: ntp}
+    - {role: tools, tags: tools}
+    - {role: sshd, tags: sshd}
+    - {role: zabbix_agent, tags: zabbix_agent}
+    - {role: mountdisk, tags: mountdisk}
+      
+  post_tasks:
+    - name: 任务完成主机
+      debug: var=ansible_default_ipv4.address 

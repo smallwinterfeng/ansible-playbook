@@ -1,0 +1,8 @@
+- name: 清除yum缓存
+  shell: |
+      yum clean all
+
+- name: 安装系统基础工具包
+  shell: |
+      yum install -y curl wget  vim htop dstat iotop telnet traceroute net-tools ethtool dos2unix lsof tcpdump lrzsz lvm2 screen
+  ignore_errors: true
