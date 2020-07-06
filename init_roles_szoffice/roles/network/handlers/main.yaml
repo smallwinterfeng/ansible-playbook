@@ -1,2 +1,0 @@
-- name: 重启网卡服务
-  service: name=network state=restarted
